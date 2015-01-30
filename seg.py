@@ -28,9 +28,9 @@ import json
 allstats = {}
 
 np.random.seed(1)
-for imgfn in args.images:
+for index,imgfn in enumerate(args.images):
     image = imread(imgfn)
-    print imgfn, image.shape
+    print "{}/{} {}: {}".format( index+1, len(args.images), imgfn, image.shape )
     image_hsv = rgb2hsv(image)
     saturation = image_hsv[:,:,1]
 
@@ -89,7 +89,7 @@ for imgfn in args.images:
     allstats[imgfn] = stats
 
     with open(args.outstats, 'w') as f:
-        json.dump(allstats,f,indent=2)
+        json.dump({'stats': allstats, 'args': vars(args)},f,indent=2)
 
     if not args.nodisplay:
         ax[1].imshow(image, interpolation='nearest')
