@@ -1,6 +1,6 @@
 import argparse
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('images', nargs='+')
 parser.add_argument('--alpha', type=float, help="adjustment parameter for the threshold", default=1.0)
 parser.add_argument('--method', choices=['otsu','gmm'], default='otsu')
@@ -21,7 +21,6 @@ from skimage.segmentation import clear_border, quickshift
 from skimage.morphology import label, closing, square
 from skimage.measure import regionprops, find_contours
 from skimage.color import rgb2hsv
-
 from sklearn.mixture import GMM
 import json
 
