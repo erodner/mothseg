@@ -15,19 +15,6 @@ import numpy as np
 if not args.nodisplay:
     import matplotlib.pyplot as plt
 
-from scipy.misc import imread
-from skimage import data
-from skimage.filters import threshold_otsu
-from skimage.segmentation import clear_border, quickshift
-from skimage.morphology import label, closing, square
-from skimage.measure import regionprops, find_contours
-from skimage.color import rgb2hsv
-
-mixture_disabled = True
-try:
-    from sklearn.mixture import GMM
-except:
-    mixture_disabled = False
 
 import json
 
@@ -37,7 +24,7 @@ np.random.seed(1)
 for index,imgfn in enumerate(args.images):
     image = imread(imgfn)
     print "{}/{} {}: {}".format( index+1, len(args.images), imgfn, image.shape )
-    stats, contour, binaryimage = seg_butterfly(image)
+    stats, contour, binaryimage = seg_butterfly(image, method=args.method, alpha=args.alpha, gmmborder=args.border)
 
     if not args.nodisplay:
         fig, ax = plt.subplots(2)
