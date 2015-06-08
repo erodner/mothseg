@@ -11,6 +11,7 @@ args = parser.parse_args()
 
 from segtools import seg_butterfly
 import numpy as np
+from scipy.misc import imread
 
 if not args.nodisplay:
     import matplotlib.pyplot as plt

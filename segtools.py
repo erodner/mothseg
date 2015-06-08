@@ -4,13 +4,13 @@ from skimage.filters import threshold_otsu
 from skimage.measure import find_contours
 from skimage.color import rgb2hsv
 
-mixture_disabled = True
+mixture_disabled = False
 try:
     from sklearn.mixture import GMM
 except ImportError:
-    mixture_disabled = False
+    mixture_disabled = True
 
-def seg_butterfly(image, method = "otsu", alpha = 1.0, gmmborder = 0.1):
+def seg_butterfly(image, method = "otsu", alpha = 1.0, gmmborder = 0.1, use_otsu = True):
     """ segment a given image and return statistics of the largest object """
     image_hsv = rgb2hsv(image)
     saturation = image_hsv[:, :, 1]
@@ -36,10 +36,16 @@ def seg_butterfly(image, method = "otsu", alpha = 1.0, gmmborder = 0.1):
         print g.covars_
         Xt = np.array(np.reshape(image_hsv, [-1,3]), dtype=float)
         s = np.reshape(g.score(Xt), image_hsv.shape[:2])
-        t = args.alpha * threshold_otsu(s)
+        if use_otsu:
+            t = alpha * threshold_otsu(s)
+        else:
+            t = alpha
+
         print "Threshold: {}".format(t)
         contours = find_contours(s, t)
         binaryimage = s>t
+    else:
+        raise Exception("Method not supported!")
 
     stats = {}
 
