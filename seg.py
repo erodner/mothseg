@@ -18,6 +18,7 @@ if not args.nodisplay:
 
 
 import json
+from os.path import basename
 
 allstats = {}
 
@@ -31,7 +32,7 @@ for index,imgfn in enumerate(args.images):
         fig, ax = plt.subplots(2)
 
     print "Statistics in segmented region: {}".format( json.dumps(stats, indent=2) )
-    allstats[imgfn] = stats
+    allstats[basename(imgfn)] = stats
 
     with open(args.outstats, 'w') as f:
         json.dump({'stats': allstats, 'args': vars(args)},f,indent=2)

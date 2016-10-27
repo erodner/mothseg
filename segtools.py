@@ -10,6 +10,19 @@ try:
 except ImportError:
     mixture_disabled = True
 
+# Use Green's theorem to compute the area
+# enclosed by the given contour.
+def contour_area(vs):
+    a = 0
+    x0,y0 = vs[0]
+    for [x1,y1] in vs[1:]:
+        dx = x1-x0
+        dy = y1-y0
+        a += 0.5*(y0*dx - x0*dy)
+        x0 = x1
+        y0 = y1
+    return a
+
 def seg_butterfly(image, method = "otsu", alpha = 1.0, gmmborder = 0.1, use_otsu = True):
     """ segment a given image and return statistics of the largest object """
     image_hsv = rgb2hsv(image)
@@ -62,12 +75,13 @@ def seg_butterfly(image, method = "otsu", alpha = 1.0, gmmborder = 0.1, use_otsu
         if len(contours[n])>len(contours[maxc]):
             maxc = n
 
-    stats['contour-length'] = len(contours[maxc])
+    stats['c-length'] = len(contours[maxc])
+    stats['c-area'] = contour_area(contours[maxc])
 
     # compute bounding box
-    stats['xmin'] = np.amin( contours[maxc][:,1] )
-    stats['xmax'] = np.amax( contours[maxc][:,1] )
-    stats['ymin'] = np.amin( contours[maxc][:,0] )
-    stats['ymax'] = np.amax( contours[maxc][:,0] )
+    stats['c-xmin'] = np.amin( contours[maxc][:,1] )
+    stats['c-xmax'] = np.amax( contours[maxc][:,1] )
+    stats['c-ymin'] = np.amin( contours[maxc][:,0] )
+    stats['c-ymax'] = np.amax( contours[maxc][:,0] )
 
     return stats, contours[maxc], binaryimage
