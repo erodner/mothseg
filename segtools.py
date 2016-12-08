@@ -2,7 +2,10 @@
 import numpy as np
 from skimage.filters import threshold_otsu
 from skimage.measure import find_contours
-from skimage.color import rgb2hsv
+from skimage.color import rgb2hsv, rgb2gray
+import skimage
+from skimage import feature
+from scipy.spatial.distance import pdist, squareform
 
 mixture_disabled = False
 try:
@@ -85,3 +88,51 @@ def seg_butterfly(image, method = "otsu", alpha = 1.0, gmmborder = 0.1, use_otsu
     stats['c-ymax'] = np.amax( contours[maxc][:,0] )
 
     return stats, contours[maxc], binaryimage
+
+# See the ipython notebook for details on the following code
+def estimate_corners(imgr):
+    response = feature.corner_shi_tomasi(imgr)
+    corners = feature.corner_peaks(response, min_distance=5)
+    return corners
+
+def optimize_quant_error(A, verbose=False):
+    smallest_quant_error = float("inf")
+    max_d = np.percentile(A, 20)
+    min_d = np.percentile(A, 1)
+    print ("Calibration length bounds: {} <= d <= {}".format(min_d, max_d))
+    for d in np.arange(min_d,max_d,0.25):
+        grid = np.arange(0,np.max(A)+d,d)
+        if len(grid)<=2: continue
+
+        # compute quantization error
+        bins = (grid[:-1]+grid[1:])/2.0
+        prototypes = grid[1:-1]
+        bin_assignment = np.digitize(A, bins) - 1
+        bin_assignment[bin_assignment==-1] = 0
+        bin_assignment[bin_assignment==len(prototypes)] = len(prototypes)-1
+    
+        # quantization error with BIC model selection
+        # adhoc version
+        n = len(A)
+        quant_error = np.linalg.norm(A - prototypes[bin_assignment]) + len(prototypes)*np.log(n)
+        # theoretically derived criterion
+        #quant_error = n*np.log(2*np.pi) + np.linalg.norm(A - prototypes[bin_assignment])**2 + len(prototypes)*np.log(n)
+       
+        if verbose:
+            print ("{}: {} {}".format(d, quant_error, unused_bins))
+        if quant_error < smallest_quant_error:
+            smallest_quant_error = quant_error
+            best_distance = d
+
+    return best_distance
+
+
+def estimate_calibration_length(img, crop_left=0.1, crop_bottom=0.3):
+    imgr = skimage.color.rgb2gray(img[-int(crop_bottom*img.shape[0]):,:int(crop_left*img.shape[1]),:])
+    corners = estimate_corners(imgr)
+    if len(corners)==0:
+        return -1
+    A = pdist(corners, metric='cityblock')
+    return optimize_quant_error(A)
+
+
