@@ -52,4 +52,4 @@ Statistics in segmented region: {
 }
 ```
 and in addition show the following on the screen:
-![alt text](https://github.com/mothseg/raw/master/doc/test.jpg "Screenshot of a demo result")
+![alt text](https://github.com/erodner/mothseg/blob/master/doc/screenshot.png "Screenshot of a demo result")
