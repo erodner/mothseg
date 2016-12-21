@@ -53,3 +53,22 @@ Statistics in segmented region: {
 ```
 and in addition show the following on the screen:
 ![alt text](https://github.com/erodner/mothseg/blob/master/doc/screenshot.png "Screenshot of a demo result")
+
+You can specify multiple images on the command line if you want to perform processing for the entire dataset.
+In this case, I recommend to use:
+```
+python seg.py --displaymode pdf --outstats results.json test1.jpg test2.jpg ...
+```
+to write out the results as text to ``results.json`` (in JSON format) and as images to several pdf files.
+Furthermore, the segmentation can be controlled with some parameters for adjusting it to your images, please see ``python seg.py -h`` for details.
+
+## Further notes
+
+1. The calibration can fail for which in this case the respective variables ``c-area-calibrated``, ``height-calibrated``, and ``width-calibrated`` are
+not available in the results.
+2. The segmentation and calibration pattern detection is simple and might need some additional thoughts for more difficult datasets.
+3. If the segmentation fails, try to adjust the alpha parameter by ``--alpha 0.8`` or something similar. Good luck :)
+
+## Disclaimer
+
+This work has been created as part of a cooperation project at the University of Jena. The images have been provided by Gunnar Brehm.
