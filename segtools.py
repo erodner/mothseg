@@ -65,13 +65,20 @@ def seg_butterfly(image, method = "otsu", alpha = 1.0, gmmborder = 0.1, use_otsu
 
     stats = {}
 
+    
+    # The intensity channel
     v = image_hsv[ binaryimage, 2 ]
+    # The saturation channel
+    s = image_hsv[ binaryimage, 1 ]
 
-    stats['median-v'] = np.median(v)
-    stats['mean-v'] = np.mean(v)
-    stats['stddev-v'] = np.std(v)
-    stats['absolute-size'] = len(v)
-    stats['relative-size'] = len(v) / float( image_hsv.shape[0] * image_hsv.shape[1] )
+    stats['median-intensity'] = np.median(v)
+    stats['mean-intensity'] = np.mean(v)
+    stats['stddev-intensity'] = np.std(v)
+    stats['median-saturation'] = np.median(s)
+    stats['mean-saturation'] = np.mean(s)
+    stats['stddev-saturation'] = np.std(s)
+    stats['seg-absolute-size'] = len(v)
+    stats['seg-relative-size'] = len(v) / float( image_hsv.shape[0] * image_hsv.shape[1] )
 
     maxc = 0
     for n, contour in enumerate(contours):
