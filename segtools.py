@@ -29,8 +29,9 @@ def contour_area(vs):
 def seg_butterfly(image, method = "otsu", alpha = 1.0, gmmborder = 0.1, use_otsu = True):
     """ segment a given image and return statistics of the largest object """
     image_hsv = rgb2hsv(image)
-    saturation = image_hsv[:, :, 1]
+    saturation = image_hsv[ :, :, 1 ]
 
+   
     if method == "otsu":
         t = alpha * threshold_otsu(saturation)
         print "Threshold: {}".format(t)
@@ -62,23 +63,28 @@ def seg_butterfly(image, method = "otsu", alpha = 1.0, gmmborder = 0.1, use_otsu
         binaryimage = s>t
     else:
         raise Exception("Method not supported!")
+   
+    # The intensity channel
+    value_channel = image_hsv[ binaryimage, 2 ]
+    # The saturation channel
+    saturation = image_hsv[ binaryimage, 1 ]
+    # The hue channel
+    hue = image_hsv[ binaryimage, 0 ]
+
 
     stats = {}
 
-    
-    # The intensity channel
-    v = image_hsv[ binaryimage, 2 ]
-    # The saturation channel
-    s = image_hsv[ binaryimage, 1 ]
-
-    stats['median-intensity'] = np.median(v)
-    stats['mean-intensity'] = np.mean(v)
-    stats['stddev-intensity'] = np.std(v)
-    stats['median-saturation'] = np.median(s)
-    stats['mean-saturation'] = np.mean(s)
-    stats['stddev-saturation'] = np.std(s)
-    stats['seg-absolute-size'] = len(v)
-    stats['seg-relative-size'] = len(v) / float( image_hsv.shape[0] * image_hsv.shape[1] )
+    stats['median-intensity'] = np.median(value_channel)
+    stats['mean-intensity'] = np.mean(value_channel)
+    stats['stddev-intensity'] = np.std(value_channel)
+    stats['median-saturation'] = np.median(saturation)
+    stats['mean-saturation'] = np.mean(saturation)
+    stats['stddev-saturation'] = np.std(saturation)
+    stats['median-hue'] = np.median(hue)
+    stats['mean-hue'] = np.mean(hue)
+    stats['stddev-hue'] = np.std(hue)
+    stats['seg-absolute-size'] = len(value_channel)
+    stats['seg-relative-size'] = len(value_channel) / float( image_hsv.shape[0] * image_hsv.shape[1] )
 
     maxc = 0
     for n, contour in enumerate(contours):

@@ -73,6 +73,9 @@ all attributes marked with ```-calibrated``` are not calculated.
 * ```calibration-length```: pixels/mm (derived from the mm-scale in the image)
 * ```seg-absolute-size```: area in pixel of the moth derived from the binary segmentation
 * ```seg-relative-size```: relative area spanned by the moth derived from the binary segmentation
+* ```mean-hue```: mean of the moth hue (H channel of the HSV colour space, derived from binary segmentation)
+* ```median-hue```: median of the moth hue (H channel of the HSV colour space, derived from the binary segmentation)
+* ```stddev-hue```: standard deviation of the moth hue (H channel of the HSV colour space, derived from the binary segmentation)
 * ```mean-intensity```: mean of the moth intensity (V channel of the HSV colour space, derived from binary segmentation)
 * ```median-intensity```: median of the moth intensity (V channel of the HSV colour space, derived from the binary segmentation)
 * ```stddev-intensity```: standard deviation of the moth intensity (V channel of the HSV colour space, derived from the binary segmentation)
