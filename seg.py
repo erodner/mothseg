@@ -9,6 +9,13 @@ parser.add_argument('--displaymode', choices=['disabled', 'pdf', 'png', 'screen'
     default='screen')
 parser.add_argument('--nocalibration', action='store_true', help='disable calibration')
 parser.add_argument('--outstats', default='stats.json', help='output file for statistics')
+parser.add_argument('--calibration_pattern', default='checkerboard', help='which calibration pattern should be assumed (checkerboard or black_bar)',
+        choices=["checkerboard", "black_bar"])
+parser.add_argument('--calibration_pos', default='bottom_left', help='where is the calibration pattern located (bottom_left, bottom_right, top_left, top_right)',
+        choices=["bottom_left", "bottom_right", "top_left", "top_right"])
+parser.add_argument("--calibration_relative_height", type=float, default=0.3)
+parser.add_argument("--calibration_relative_width", type=float, default=0.1)
+
 args = parser.parse_args()
 
 from segtools import *
@@ -31,7 +38,8 @@ for index,imgfn in enumerate(args.images):
     stats, contour, binaryimage = seg_butterfly(image, method=args.method, alpha=args.alpha, gmmborder=args.border)
 
     if not args.nocalibration:
-        cal_length = estimate_calibration_length(image)
+        cal_length = estimate_calibration_length(image, calibration_pattern=args.calibration_pattern, 
+                crop_x=args.calibration_relative_width, crop_y=args.calibration_relative_height, pos=args.calibration_pos)
         if cal_length>0:
             stats['c-area-calibrated'] = stats['c-area']/cal_length**2
             stats['width-calibrated'] = (stats['c-xmax']-stats['c-xmin'])/cal_length

@@ -140,12 +140,33 @@ def optimize_quant_error(A, verbose=False):
     return best_distance
 
 
-def estimate_calibration_length(img, crop_left=0.1, crop_bottom=0.3):
-    imgr = skimage.color.rgb2gray(img[-int(crop_bottom*img.shape[0]):,:int(crop_left*img.shape[1]),:])
-    corners = estimate_corners(imgr)
-    if len(corners)==0:
-        return -1
-    A = pdist(corners, metric='cityblock')
-    return optimize_quant_error(A)
+def estimate_calibration_length(img, calibration_pattern="checkerboard", crop_x=0.1, crop_y=0.3, pos="bottom_left"):
+    w = int(crop_x * img.shape[1])
+    h = int(crop_y * img.shape[0])
+    if pos=="bottom_left":
+        img_crop = img[-h:,:w,:]
+    elif pos=="bottom_right": 
+        img_crop = img[-h:,-w:,:]
+    elif pos=="top_left": 
+        img_crop = img[:h,:w,:]
+    elif pos=="top_right": 
+        img_crop = img[:h,-w:,:]
+    else:
+        raise Exception("Unknown location type: {}".format(pos))
 
+    imgr = skimage.color.rgb2gray(img_crop)
+    
+    if calibration_pattern=="checkerboard":
+        corners = estimate_corners(imgr)
+        if len(corners)==0:
+            return -1
+        A = pdist(corners, metric='cityblock')
+        return optimize_quant_error(A)
+    elif calibration_pattern=="black_bar":
+        proj = np.sum(imgr, axis=0)
+        grad_proj = proj[1:] - proj[:-1]
+        calibration_length = np.abs(np.argmin(grad_proj) - np.argmax(grad_proj))
+        return calibration_length/10.0
+    else:
+        raise Exception("Unknown calibration pattern type: {}".format(calibration_pattern))
 
