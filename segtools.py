@@ -13,6 +13,13 @@ try:
 except ImportError:
     mixture_disabled = True
 
+grabcut_disabled = False
+try:
+    from cv2 import grabCut
+    import cv2
+except ImportError:
+    grabcut_disabled = True
+
 # Use Green's theorem to compute the area
 # enclosed by the given contour.
 def contour_area(vs):
@@ -39,7 +46,7 @@ def seg_butterfly(image, method = "otsu", alpha = 1.0, gmmborder = 0.1, use_otsu
         contours = find_contours(saturation, t)
         binaryimage = saturation>t
 
-    elif not mixture_disabled:
+    elif not mixture_disabled and method=="gmm":
         g = GMM(3)
         bx = int(gmmborder*image.shape[1])-1
         by = int(gmmborder*image.shape[0])-1
@@ -49,8 +56,6 @@ def seg_butterfly(image, method = "otsu", alpha = 1.0, gmmborder = 0.1, use_otsu
             np.reshape( image_hsv[-by:, :, :], [-1,3]) ] )
         print "GMM learning ..."
         g.fit(X)
-        print g.means_
-        print g.covars_
         Xt = np.array(np.reshape(image_hsv, [-1,3]), dtype=float)
         s = np.reshape(g.score(Xt), image_hsv.shape[:2])
         if use_otsu:
@@ -61,8 +66,21 @@ def seg_butterfly(image, method = "otsu", alpha = 1.0, gmmborder = 0.1, use_otsu
         print "Threshold: {}".format(t)
         contours = find_contours(s, t)
         binaryimage = s>t
+    elif not grabcut_disabled and method=="grabcut":
+        grabcut_mask = np.zeros(image.shape[:2],np.uint8)
+        grabcut_rect = (int(image.shape[1]*0.05), int(image.shape[0]*0.1), 
+                        int(image.shape[1]*0.9), int(image.shape[0]*0.8))
+        bgd_model = np.zeros((1,65),np.float64)
+        fgd_model = np.zeros((1,65),np.float64)
+        grabCut(image.astype(np.uint8), grabcut_mask, grabcut_rect, 
+                bgd_model, fgd_model,
+                10, cv2.GC_INIT_WITH_RECT )
+        grabcut_mask[grabcut_mask==2] = 0
+        grabcut_mask[grabcut_mask==3] = 1
+        binaryimage = grabcut_mask
+        contours = find_contours(binaryimage, 0.5)
     else:
-        raise Exception("Method not supported!")
+        raise Exception("Method {} not supported!".format(method))
    
     # The intensity channel
     value_channel = image_hsv[ binaryimage, 2 ]

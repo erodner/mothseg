@@ -3,7 +3,7 @@ import argparse
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('images', nargs='+', help='input images')
 parser.add_argument('--alpha', type=float, help="adjustment parameter for the automatic global threshold", default=1.0)
-parser.add_argument('--method', choices=['otsu','gmm'], help='segmentation method (global otsu threshold or GMM estimation)', default='otsu')
+parser.add_argument('--method', choices=['otsu','gmm','grabcut'], help='segmentation method (global otsu threshold or GMM estimation)', default='otsu')
 parser.add_argument('--border', type=int, default=0.1, help='relative border definition (used by GMM)')
 parser.add_argument('--displaymode', choices=['disabled', 'pdf', 'png', 'screen'], help='whether to show the segmentation result (screen), to write it to a file (pdf, png), or to skip it (disabled)',
     default='screen')
