@@ -65,6 +65,12 @@ python seg.py --displaymode pdf --outstats results.json test1.jpg test2.jpg ...
 to write out the results as text to ``results.json`` (in JSON format) and as images to several pdf files.
 Furthermore, the segmentation can be controlled with some parameters for adjusting it to your images, please see ``python seg.py -h`` for details.
 
+With the second Version all .jpeg files in the working-direction getting grapped and processed.
+```bash
+python seg2.py
+```
+
+
 ## Alternative calibration pattern
 
 As a calibration pattern, we can also assume a simple black bar (showing 1cm) on the bottom right corner as follows:
